@@ -3,8 +3,11 @@ import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine
 
-#=======================================================================
 def load_data(messages_filepath,categories_filepath):
+    """
+    Loads data from the .csv files for messages and categories and merge 
+    the two datasets into one DataFrame. Returns the merged DataFrame
+    """
     messages = pd.read_csv(messages_filepath)
     messages = messages.drop_duplicates()   
     messages = messages[np.logical_not(messages['message'].duplicated())]
@@ -16,8 +19,12 @@ def load_data(messages_filepath,categories_filepath):
     df = pd.merge(messages, categories, how = 'left', on = 'id')
     return df
 
-#=======================================================================
+
 def clean_data(df):
+    """
+    Creates category columns and extracts the boolean values for each columns.
+    Cleans the DataFrame and returns the DataFrame with the new catetory columns.
+    """
     # create a dataframe of the 36 individual category columns
     categories = df['categories'].str.split(';', expand=True)
     
@@ -46,8 +53,11 @@ def clean_data(df):
     
     return df
 
-#=======================================================================
+
 def save_data(df, database_name):
+    """
+    Save the DataFrame into a SQLite database.
+    """
     engine = create_engine('sqlite:///'+ database_name)
     df.to_sql("table1", engine, index=False)  
 

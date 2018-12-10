@@ -21,6 +21,13 @@ import pickle
 
 
 def load_data(database_name):
+    """
+    Loads data from the database and extracts observed data and target data.
+    Returns:
+    X: observed data
+    Y: target data
+    category_names: column names for the target data
+    """
     engine = create_engine('sqlite:///' + database_name)
     df = pd.read_sql_table('table1', engine)
     X = df['message']
@@ -28,6 +35,9 @@ def load_data(database_name):
     return X, Y, Y.columns.values
     
 def tokenize(text):
+    """
+    Given a piece of input text, returns the set of tokens in the text. 
+    """
     url_regex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
     detected_urls = re.findall(url_regex, text)
     for url in detected_urls:
@@ -45,6 +55,9 @@ def tokenize(text):
 
 
 def build_model():
+    """
+    Build the machine learning model with Pipeline and GridSearch.
+    """
     pipeline =  Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
@@ -62,6 +75,9 @@ def build_model():
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    """
+    Tests the model with the test dataset and reports the test scores.
+    """
     y_pred = model.predict(X_test)
     for i in range(0, Y_test.columns.shape[0]):
         print(Y_test.columns[i] + ":")
@@ -69,6 +85,9 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
 
 def save_model(model, model_filepath):
+    """
+    Save the trained model into picle file.
+    """
     pickle.dump(model, open(model_filepath, 'wb'))
 
 
